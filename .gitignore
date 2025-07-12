@@ -1,0 +1,61 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Data files
+data/raw/
+data/yolo_outputs/
+
+# Logs
+*.log
+
+# DB files (if SQLite or temp dumps)
+*.sqlite3
+*.db
+*.sql
+
+# Docker
+*.pid
+*.tar
+docker-compose.override.yml
+
+# dbt compiled artifacts
+dbt/target/
+dbt/dbt_modules/
+
+# VS Code
+.vscode/
+
+# Mac/Windows system files
+.DS_Store
+Thumbs.db
+
+# pytest cache
+.pytest_cache/
+
+# GitHub workflows cache
+.github/workflows/*.log
+
+# Output and reports
+*.csv
+*.tsv
+*.json
+*.pdf
+*.png
+*.jpg

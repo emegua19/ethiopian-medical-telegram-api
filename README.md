@@ -1,78 +1,78 @@
-
-
-##  `README.md` – Starter Template
-
-```markdown
 #  Ethiopian Medical Telegram API
 
-An end-to-end data product that scrapes, processes, enriches, and exposes insights from Ethiopian medical product discussions on public Telegram channels.
+An end-to-end data product that scrapes, processes, and structures insights from Ethiopian medical product discussions on public Telegram channels. This version reflects progress up to Task 2 (Interim Report).
 
 ---
 
 ##  Project Overview
 
-This project is designed to help analysts and stakeholders gain insights from Telegram channels related to Ethiopian medical businesses. It includes:
+This project helps analysts monitor and understand Ethiopian medical market activity by:
 
-- Automated scraping of Telegram messages and images
-- Transformation of raw data into structured format using dbt
-- Object detection on images using YOLOv8
-- Analytical API endpoints powered by FastAPI
-- Orchestrated data pipeline using Dagster
+* Scraping public Telegram messages and images
+* Structuring data using a star schema via dbt
+* Preparing data for future enrichment (YOLOv8) and API delivery (FastAPI)
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Area                  | Tools/Tech               |
-|-----------------------|--------------------------|
-| Scraping              | Telethon (Telegram API)  |
-| Data Lake & DB        | JSON, PostgreSQL         |
-| Data Transformation   | dbt                      |
-| Object Detection      | YOLOv8 (Ultralytics)     |
-| API                   | FastAPI, Uvicorn         |
-| Orchestration         | Dagster                  |
-| Environment           | Docker, .env             |
-| CI/CD                 | GitHub Actions           |
+| Area              | Tools/Tech              |
+| ----------------- | ----------------------- |
+| Scraping          | Telethon (Telegram API) |
+| Data Storage      | JSON (Data Lake)        |
+| Database          | PostgreSQL              |
+| Transformation    | dbt                     |
+| Future Enrichment | YOLOv8 (Ultralytics)    |
+| API (Planned)     | FastAPI, Uvicorn        |
+| Orchestration     | Dagster (Planned)       |
+| Dev Environment   | Docker, .env            |
+| CI/CD             | GitHub Actions          |
 
 ---
 
 ## 📁 Project Structure
 
+```plaintext
+ethiopian-medical-telegram-api/
+├── data/                     # Raw JSON + media, YOLO outputs
+│   ├── raw/
+│   └── yolo_outputs/
+├── dbt/                      # dbt project for transformation
+├── docker/                   # Docker and docker-compose setup
+├── report/                   # LaTeX report and visuals
+├── scripts/                  # Bash runner scripts
+│   ├── run_scrape.py
+│   └── run_pipeline.sh
+├── src/                      # All core scripts (scrape, load, etc.)
+├── .env                      # Credentials (excluded from Git)
+├── .github/workflows/        # CI pipelines
+├── requirements.txt          # Python dependencies
+├── setup_project.sh          # Local setup script
+└── README.md                 # Project overview (this file)
 ```
 
-ethiopian-medical-telegram-api/
-├── data/                  # Raw data & YOLO outputs
-├── dbt/                   # dbt project for transformation
-├── src/                   # All source code
-├── scripts/               # Bash scripts to run components
-├── docker/                # Docker & Compose configs
-├── .env                   # Secrets (excluded from Git)
-├── requirements.txt       # Python dependencies
-├── run\_pipeline.sh        # Optional runner script
-└── .github/workflows/     # CI pipeline
+---
 
-````
+##  Key Features So Far
+
+*  Scrapes public Telegram messages & images from selected medical channels
+*  Stores them as JSON in a structured date-partitioned Data Lake
+*  Loads messages into a PostgreSQL `raw.telegram_messages` table
+*  Transforms data using dbt into a star schema:
+
+  * `dim_channels`, `dim_dates`, `fct_messages`
+* ✅ Validates data using dbt tests and generates documentation
 
 ---
 
-##  Key Features
-
--  **Scrape** health-related messages & media from Telegram
--  **Clean & structure** data into a star schema using dbt
--  **Enrich** image data using YOLOv8 object detection
--  **Query insights** via API endpoints (e.g., top products, activity trends)
--  **Orchestrate** the whole pipeline using Dagster
--  **Dockerized** for consistent deployment
-
----
-
-##  Quick Start
+##  Quick Start (Local Environment)
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/emegua19/ethiopian-medical-telegram-api.git
 cd ethiopian-medical-telegram-api
-````
+```
 
 ### 2. Create `.env` file
 
@@ -84,15 +84,16 @@ DB_USER=postgres
 DB_PASSWORD=your_password
 ```
 
-### 3. Build and Run via Docker
+### 3. Activate virtual environment (if Docker fails)
 
 ```bash
-docker-compose up --build
+chmod +x setup_project.sh
+./setup_project.sh
 ```
 
 ---
 
-## 🔌 API Endpoints (Example)
+## 🔌 Planned API Endpoints (For Future Tasks)
 
 * `GET /api/reports/top-products?limit=10`
 * `GET /api/channels/{channel_name}/activity`
@@ -102,23 +103,32 @@ docker-compose up --build
 
 ##  Tasks Overview
 
-| Task   | Description                                      |
-| ------ | ------------------------------------------------ |
-| Task 0 | Environment setup (Docker, .env, GitHub Actions) |
-| Task 1 | Telegram scraping and image collection           |
-| Task 2 | Load and transform data using dbt (star schema)  |
-| Task 3 | YOLOv8 object detection on images                |
-| Task 4 | Analytical API with FastAPI                      |
-| Task 5 | Full pipeline orchestration using Dagster        |
+| Task   | Description                                  | Status      |
+| ------ | -------------------------------------------- | ----------- |
+| Task 0 | Setup (Docker, venv, CI, secrets)            | ✅ Completed |
+| Task 1 | Telegram message scraping + media collection | ✅ Completed |
+| Task 2 | Load & transform with dbt (star schema)      | ✅ Completed |
+| Task 3 | YOLOv8 object detection                      | 🔜 Upcoming |
+| Task 4 | Analytical API with FastAPI                  | 🔜 Upcoming |
+| Task 5 | Dagster orchestration of full pipeline       | 🔜 Upcoming |
+
+---
+
+##  Screenshots (See `/report/img/`)
+
+* `system_architecture.png`: Overview of all components
+* `pipeline_interim.png`: Current working pipeline
+* `scrape_log_sample.png`: Sample scraping logs
+* `raw_data_table.png`: PostgreSQL message table preview
 
 ---
 
 ##  References
 
 * [Telethon Docs](https://docs.telethon.dev/)
-* [dbt Docs](https://docs.getdbt.com/)
-* [Ultralytics YOLOv8](https://docs.ultralytics.com/)
-* [FastAPI Docs](https://fastapi.tiangolo.com/)
+* [dbt Documentation](https://docs.getdbt.com/)
+* [YOLOv8](https://docs.ultralytics.com/)
+* [FastAPI](https://fastapi.tiangolo.com/)
 * [Dagster](https://docs.dagster.io/)
 
 ---
@@ -126,6 +136,4 @@ docker-compose up --build
 ## ✍️ Author
 
 **Yitbarek Geletaw**
-Project for 10 Academy – Week 7
-
----
+10 Academy — Week 7 Interim Report

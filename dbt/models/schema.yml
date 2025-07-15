@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: stg_telegram_messages
+    columns:
+      - name: message_id
+        tests:
+          - not_null
+          - unique
+      - name: channel_name
+        tests:
+          - not_null
+
+  - name: dim_channels
+    columns:
+      - name: channel_id
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_dates
+    columns:
+      - name: date_id
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_messages
+    columns:
+      - name: message_id
+        tests:
+          - not_null
+          - unique
+      - name: channel_id
+        tests:
+          - not_null
+      - name: date_id
+        tests:
+          - not_null
+
+tests:
+  - name: no_duplicate_messages_per_channel
+    description: "Ensure no duplicate message_id per channel"
+    config:
+      severity: warn
+    query: |
+      SELECT message_id, channel_name
+      FROM {{ ref('fct_messages') }}
+      GROUP BY message_id, channel_name
+      HAVING COUNT(*) > 1

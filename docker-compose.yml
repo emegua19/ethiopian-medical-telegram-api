@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    command: ["dagster", "dev", "-h", "0.0.0.0", "-p", "8000"]
+
+  postgres:
+    image: postgres:13
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  pgdata:

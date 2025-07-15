@@ -114,7 +114,7 @@ chmod +x setup_project.sh
 
 ---
 
-##  Screenshots (See `/report/img/`)
+##  Screenshots (See `/docs/img/`)
 
 * `system_architecture.png`: Overview of all components
 * `pipeline_interim.png`: Current working pipeline

@@ -6,6 +6,6 @@ sqlalchemy
 python-dotenv
 ultralytics
 dbt-postgres
-dbt
 dagster
 pytest
+dbt-core

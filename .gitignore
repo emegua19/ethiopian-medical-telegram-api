@@ -38,6 +38,7 @@ docker-compose.override.yml
 # dbt compiled artifacts
 dbt/target/
 dbt/dbt_modules/
+dbt/profiles.yml
 
 # VS Code
 .vscode/

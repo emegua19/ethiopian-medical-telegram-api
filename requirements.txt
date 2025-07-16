@@ -1,11 +1,30 @@
+# Telegram scraping
 telethon
+
+# API
 fastapi
 uvicorn
+
+# Database + ORM
 psycopg2-binary
 sqlalchemy
+
+# Environment
 python-dotenv
+
+# Object Detection
 ultralytics
-dbt-postgres
-dagster
+
+# dbt for transformation (use only one line)
+dbt-postgres==1.7.9
+
+# Orchestration (pin for pydantic compatibility)
+dagster==1.6.12
+dagster-webserver==1.6.12
+
+# Testing
 pytest
-dbt-core
+
+# Optional utils
+tqdm
+requests

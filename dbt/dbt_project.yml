@@ -1,16 +1,19 @@
 name: 'telegram_dbt'
-version: '1.0.0'
+version: '1.0'
 config-version: 2
+
 profile: 'telegram_dbt'
-model-paths: ["models"]
-seed-paths: ["seeds"]
-test-paths: ["tests"]
-analysis-paths: ["analyses"]
-docs-paths: ["docs"]
+
+source-paths: ['models']
+target-path: 'target'
+clean-targets: ['target', 'dbt_modules']
 
 models:
   telegram_dbt:
     staging:
+      +schema: staging
       +materialized: view
     marts:
+      +schema: marts
       +materialized: table
+

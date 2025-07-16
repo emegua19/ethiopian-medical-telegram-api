@@ -39,6 +39,8 @@ docker-compose.override.yml
 dbt/target/
 dbt/dbt_modules/
 dbt/profiles.yml
+*.session
+*.user.yml
 
 # VS Code
 .vscode/

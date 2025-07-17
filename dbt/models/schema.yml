@@ -5,47 +5,75 @@ models:
     description: "Cleaned and standardized raw messages from Telegram."
     columns:
       - name: message_id
+        description: "Unique ID for the message."
         tests: [not_null, unique]
       - name: message_date
+        description: "Timestamp when the message was posted."
         tests: [not_null]
       - name: channel_name
+        description: "Name of the Telegram channel in lowercase."
         tests: [not_null]
+      - name: message_text
+        description: "Cleaned text of the message."
+      - name: file_path
+        description: "File path of the attached image or media."
 
   - name: dim_channels
     description: "Dimension table for distinct Telegram channels."
     columns:
       - name: channel_id
+        description: "Unique ID for the channel."
         tests: [not_null, unique]
+      - name: channel_name
+        description: "Name of the channel (from source)."
 
   - name: dim_dates
     description: "Dimension table for message dates (year, month, day)."
     columns:
       - name: date_id
+        description: "Unique date identifier (YYYYMMDD)."
         tests: [not_null, unique]
+      - name: full_date
+        description: "Full calendar date."
+      - name: year
+        description: "Year extracted from date."
+      - name: month
+        description: "Month extracted from date."
+      - name: day
+        description: "Day extracted from date."
 
   - name: fct_messages
     description: "Fact table linking messages to dates and channels with metrics."
     columns:
       - name: message_id
+        description: "Unique ID for the message."
         tests: [not_null]
       - name: message_date
+        description: "Date the message was posted."
+        tests: [not_null]
+      - name: channel_id
+        description: "Foreign key to dim_channels."
+        tests: [not_null]
+      - name: date_id
+        description: "Foreign key to dim_dates."
         tests: [not_null]
       - name: has_image
+        description: "Boolean flag indicating if the message includes an image."
+      - name: message_text
+        description: "Cleaned text of the message."
+      - name: file_path
+        description: "Image path (if any)."
 
   - name: fct_image_detections
-    description: YOLO-based image object detection results linked with telegram messages
+    description: "Fact table for YOLO object detections in Telegram message images."
     columns:
       - name: message_id
-        description: Unique Telegram message ID
-      - name: channel
-        description: Telegram channel name
+        description: "ID of the message where detection occurred."
+        tests: [not_null]
       - name: detected_class
-        description: Object class detected in image
+        description: "Detected object class name (from YOLO)."
+        tests: [not_null]
       - name: detection_confidence
-        description: Confidence score of YOLO detection
-      - name: date
-        description: When the message was posted
-      - name: text
-        description: Telegram message text
-      - name: file_path
-        description: Local image file path
+        description: "Confidence score from the YOLO detection."
+      - name: channel_name
+        description: "Channel name associated with the message."

@@ -12,7 +12,7 @@ models:
   telegram_dbt:
     staging:
       +schema: staging
-      +materialized: view
+      +materialized: table
     marts:
       +schema: marts
       +materialized: table

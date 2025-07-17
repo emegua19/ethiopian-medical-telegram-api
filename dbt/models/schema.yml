@@ -31,3 +31,21 @@ models:
       - name: message_date
         tests: [not_null]
       - name: has_image
+
+  - name: fct_image_detections
+    description: YOLO-based image object detection results linked with telegram messages
+    columns:
+      - name: message_id
+        description: Unique Telegram message ID
+      - name: channel
+        description: Telegram channel name
+      - name: detected_class
+        description: Object class detected in image
+      - name: detection_confidence
+        description: Confidence score of YOLO detection
+      - name: date
+        description: When the message was posted
+      - name: text
+        description: Telegram message text
+      - name: file_path
+        description: Local image file path

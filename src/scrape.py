@@ -42,27 +42,35 @@ async def scrape_channel(channel):
         os.makedirs(messages_dir, exist_ok=True)
         os.makedirs(media_dir, exist_ok=True)
 
-        async for message in client.iter_messages(target_channel, limit=100):  # Adjust limit as needed
+        async for message in client.iter_messages(target_channel, limit=100):
+            media_path = None
+
+            # Download image if present
+            if message.photo or message.document:
+                downloaded = await client.download_media(message, file=media_dir)
+                if downloaded:
+                    media_path = f"{media_dir}/{channel}_{message.id}.jpg"
+                    os.rename(downloaded, media_path)
+                    logger.info(f"Saved image {message.id} from {channel}")
+
+            # Construct message data with image path
             message_data = {
                 'id': message.id,
                 'date': str(message.date),
                 'text': message.text if message.text else None,
-                'channel': channel
+                'channel': channel,
+                'file_path': media_path  # This is new
             }
-            filename = f"{messages_dir}/{message.id}.json"
-            with open(filename, 'w', encoding='utf-8') as f:
+
+            # Save JSON message with file_path
+            json_path = f"{messages_dir}/{message.id}.json"
+            with open(json_path, 'w', encoding='utf-8') as f:
                 json.dump(message_data, f, ensure_ascii=False, indent=4)
             logger.info(f"Saved message {message.id} from {channel}")
 
-            if message.photo or message.document:
-                media_file = await client.download_media(message, file=media_dir)
-                if media_file:
-                    new_filename = f"{media_dir}/{channel}_{message.id}.jpg"
-                    os.rename(media_file, new_filename)
-                    logger.info(f"Saved image {message.id} from {channel}")
-
     except Exception as e:
         logger.error(f"Error scraping {channel}: {str(e)}")
+
 
 async def main():
     await client.start(phone)

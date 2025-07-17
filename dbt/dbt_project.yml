@@ -4,7 +4,7 @@ config-version: 2
 
 profile: 'telegram_dbt'
 
-source-paths: ['models']
+model-paths: ['models']
 target-path: 'target'
 clean-targets: ['target', 'dbt_modules']
 

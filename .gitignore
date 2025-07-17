@@ -39,7 +39,7 @@ docker-compose.override.yml
 dbt/target/
 dbt/dbt_modules/
 dbt/profiles.yml
-*.session
+session_name.session
 *.user.yml
 
 # VS Code
@@ -62,3 +62,4 @@ Thumbs.db
 *.pdf
 *.png
 *.jpg
+*.pt

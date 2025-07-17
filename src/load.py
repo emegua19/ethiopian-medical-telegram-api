@@ -22,9 +22,12 @@ conn = psycopg2.connect(
 )
 cursor = conn.cursor()
 
+# === Drop table with CASCADE to remove dbt views too ===
+cursor.execute("DROP TABLE IF EXISTS raw.telegram_messages CASCADE;")
+conn.commit()
+
 # === Create schema and table ===
 cursor.execute("CREATE SCHEMA IF NOT EXISTS raw;")
-cursor.execute("DROP TABLE IF EXISTS raw.telegram_messages;")
 cursor.execute("""
     CREATE TABLE raw.telegram_messages (
         id SERIAL PRIMARY KEY,
@@ -38,37 +41,73 @@ cursor.execute("""
 """)
 conn.commit()
 
-# === Load individual JSON message files ===
+# === Load JSON files ===
 raw_dir = "data/raw/telegram_messages"
+media_root = "data/raw/media"
 loaded_count = 0
+skipped_files = 0
 
 for root, _, files in os.walk(raw_dir):
     for file in files:
         if file.endswith('.json'):
             file_path = os.path.join(root, file)
-            channel_name = os.path.basename(root)  # folder = channel
-            with open(file_path, 'r', encoding='utf-8') as f:
-                try:
-                    msg = json.load(f)  # now msg is ONE dict
+            channel_name = os.path.basename(root)
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                # Handle both single message (dict) and list of messages
+                messages = [data] if isinstance(data, dict) else data if isinstance(data, list) else []
+                if not messages:
+                    print(f"⚠️ Skipped {file_path} – not a valid JSON object or list")
+                    skipped_files += 1
+                    continue
+
+                for msg in messages:
+                    if not isinstance(msg, dict):
+                        print(f"⚠️ Skipped non-dict message in {file_path}")
+                        continue
+
                     msg_id = msg.get('id')
                     msg_text = msg.get('message') or msg.get('text')
                     msg_date = msg.get('date')
-                    if msg_date:
-                        msg_date = datetime.fromisoformat(msg_date)
-                    else:
-                        continue  # skip if no date
 
+                    # Convert date
+                    if msg_date:
+                        try:
+                            msg_date = datetime.fromisoformat(msg_date)
+                        except Exception:
+                            try:
+                                msg_date = datetime.strptime(msg_date, "%Y-%m-%dT%H:%M:%S")
+                            except Exception:
+                                continue
+                    else:
+                        continue
+
+                    # Get file_path from JSON, or guess it
+                    file_path_field = msg.get('file_path')
+                    if not file_path_field:
+                        guessed_path = os.path.join(media_root, channel_name, f"{channel_name}_{msg_id}.jpg")
+                        if os.path.exists(guessed_path):
+                            file_path_field = guessed_path
+
+                    # Insert into DB
                     cursor.execute("""
                         INSERT INTO raw.telegram_messages (message_id, date, text, channel, file_path)
                         VALUES (%s, %s, %s, %s, %s)
                         ON CONFLICT ON CONSTRAINT unique_message_channel DO NOTHING;
-                    """, (msg_id, msg_date, msg_text, channel_name, file_path))
+                    """, (msg_id, msg_date, msg_text, channel_name, file_path_field))
                     loaded_count += 1
-                except Exception as e:
-                    print(f"⚠️ Skipped {file_path} due to error: {e}")
+
+            except Exception as e:
+                print(f"⚠️ Skipped {file_path} due to error: {e}")
+                skipped_files += 1
 
 conn.commit()
-print(f" Inserted {loaded_count} messages into raw.telegram_messages")
+
+# === Final Report ===
+print(f"✅ Inserted {loaded_count} messages into raw.telegram_messages")
+print(f"⚠️ Skipped {skipped_files} files")
 
 # === Close connection ===
 cursor.close()
